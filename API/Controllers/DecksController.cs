@@ -1,5 +1,7 @@
+using System.Text.Json;
 using System.Threading.Tasks;
 using API.DTOs;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,11 +16,13 @@ public class DecksController : ControllerBase
     public DecksController(IServiceManager service) => _service = service;
 
     [HttpGet]
-    public async Task<IActionResult> GetAllPublicDecks()
+    public async Task<IActionResult> GetAllPublicDecks([FromQuery] DeckParameters deckParameters)
     {
-        var decks = await _service.DeckService.GetPublicDecksAsync(false);
+        var pagedResult = await _service.DeckService.GetPublicDecksAsync(deckParameters, trackChanges: false);
 
-        return Ok(decks);
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+
+        return Ok(pagedResult.decks);
     }
 
     [HttpPost]

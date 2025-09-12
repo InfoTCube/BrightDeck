@@ -1,6 +1,7 @@
 using API.DTOs;
 using API.Entities;
 using API.Entities.Exceptions;
+using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 
@@ -17,13 +18,13 @@ public class DeckService : IDeckService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<DeckDto>> GetPublicDecksAsync(bool trackChanges)
+    public async Task<(IEnumerable<DeckDto> decks, MetaData metaData)> GetPublicDecksAsync(DeckParameters deckParameters, bool trackChanges)
     {
-        var decks = await _repository.DeckRepository.GetDecksAsync(trackChanges);
+        var decksWithMetaData = await _repository.DeckRepository.GetDecksAsync(deckParameters, trackChanges);
 
-        var decksDtos = _mapper.Map<IEnumerable<DeckDto>>(decks);
+        var decksDtos = _mapper.Map<IEnumerable<DeckDto>>(decksWithMetaData);
 
-        return decksDtos;
+        return (decks: decksDtos, metaData: decksWithMetaData.MetaData);
     }
 
     public async Task<DeckDto> CreateDeckAsync(DeckForCreationDto deckForCreation, bool trackChanges)

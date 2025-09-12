@@ -1,4 +1,5 @@
 using API.Entities;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,12 +19,13 @@ public class DeckRepository : RepositoryBase<Deck>, IDeckRepository
         return deck;
     }
 
-    public async Task<IList<Deck>> GetDecksAsync(bool trackChanges)
+    public async Task<PagedList<Deck>> GetDecksAsync(DeckParameters deckParameters, bool trackChanges)
     {
         var decks = await FindByCondition(d => d.Public, trackChanges)
             .ToListAsync();
 
-        return decks;
+        return PagedList<Deck>
+            .ToPagedList(decks, deckParameters.PageNumber, deckParameters.PageSize);
     }
 
     public void CreateDeck(Deck deck) => Create(deck);
