@@ -7,7 +7,7 @@ using AutoMapper;
 
 namespace API.Services;
 
-public class DeckService : IDeckService
+public sealed class DeckService : IDeckService
 {
     private readonly IRepositoryManager _repository;
     private readonly IMapper _mapper;

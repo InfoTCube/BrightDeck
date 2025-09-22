@@ -1,8 +1,8 @@
 using System.Text.Json;
-using System.Threading.Tasks;
 using API.DTOs;
 using API.Helpers;
 using API.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -15,6 +15,7 @@ public class DecksController : ControllerBase
 
     public DecksController(IServiceManager service) => _service = service;
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAllPublicDecks([FromQuery] DeckParameters deckParameters)
     {

@@ -11,5 +11,6 @@ public class MappingProfile : Profile
         CreateMap<DeckForCreationDto, Deck>();
         CreateMap<FlashcardForCreationDto, Flashcard>();
         CreateMap<Deck, DeckDto>();
+        CreateMap<UserForRegistrationDto, AppUser>();
     }
 }
