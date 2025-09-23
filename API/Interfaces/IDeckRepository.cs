@@ -8,6 +8,7 @@ public interface IDeckRepository
 {
     Task<Deck> GetDeckByIdAsync(Guid id, bool trackChanges);
     Task<PagedList<Deck>> GetDecksAsync(DeckParameters deckParameters, bool trackChanges);
+    Task<PagedList<Deck>> GetDecksForUserAsync(DeckParameters deckParameters, string username, bool trackChanges);
     void CreateDeck(Deck deck);
     void DeleteDeck(Deck deck);
 }

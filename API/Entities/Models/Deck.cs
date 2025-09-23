@@ -8,4 +8,5 @@ public class Deck
     public bool Public { get; set; }
     public DateTime CreatedAt { get; set; }
     public ICollection<Flashcard>? Flashcards { get; set; }
+    public AppUser? Author { get; set; }
 }

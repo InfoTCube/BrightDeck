@@ -15,7 +15,6 @@ public class DecksController : ControllerBase
 
     public DecksController(IServiceManager service) => _service = service;
 
-    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAllPublicDecks([FromQuery] DeckParameters deckParameters)
     {
@@ -26,10 +25,21 @@ public class DecksController : ControllerBase
         return Ok(pagedResult.decks);
     }
 
+    [Authorize]
+    [HttpGet("currentUser")]
+    public async Task<IActionResult> GetDecksForCurrentUser([FromQuery] DeckParameters deckParameters)
+    {
+        var pagedResult = await _service.DeckService.GetDecksForCurrentUser(deckParameters, User.Identity.Name, trackChanges: false);
+
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+
+        return Ok(pagedResult.decks);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateDeck([FromBody] DeckForCreationDto deck)
     {
-        var deckResponse = await _service.DeckService.CreateDeckAsync(deck, false);
+        var deckResponse = await _service.DeckService.CreateDeckAsync(deck, User.Identity.Name, false);
 
         //return CreatedAtRoute("GetDeck", deckResponse);
         return Created();

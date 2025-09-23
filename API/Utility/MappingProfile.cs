@@ -10,7 +10,8 @@ public class MappingProfile : Profile
     {
         CreateMap<DeckForCreationDto, Deck>();
         CreateMap<FlashcardForCreationDto, Flashcard>();
-        CreateMap<Deck, DeckDto>();
+        CreateMap<Deck, DeckDto>()
+            .ForMember(d => d.AuthorUsername, opt => opt.MapFrom(src => src.Author.UserName));
         CreateMap<UserForRegistrationDto, AppUser>();
     }
 }

@@ -22,6 +22,17 @@ public class DeckRepository : RepositoryBase<Deck>, IDeckRepository
     public async Task<PagedList<Deck>> GetDecksAsync(DeckParameters deckParameters, bool trackChanges)
     {
         var decks = await FindByCondition(d => d.Public, trackChanges)
+            .Include(d => d.Author)
+            .ToListAsync();
+
+        return PagedList<Deck>
+            .ToPagedList(decks, deckParameters.PageNumber, deckParameters.PageSize);
+    }
+
+    public async Task<PagedList<Deck>> GetDecksForUserAsync(DeckParameters deckParameters, string username, bool trackChanges)
+    {
+        var decks = await FindByCondition(d => d.Author.UserName == username, trackChanges)
+            .Include(d => d.Author)
             .ToListAsync();
 
         return PagedList<Deck>

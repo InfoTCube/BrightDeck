@@ -15,7 +15,7 @@ public sealed class ServiceManager : IServiceManager
     public ServiceManager(IRepositoryManager repositoryManager, IMapper mapper, ILoggerManager logger,
         UserManager<AppUser> userManager, IOptions<JwtConfiguration> configuration)
     {
-        _deckService = new Lazy<IDeckService>(() => new DeckService(repositoryManager, mapper));
+        _deckService = new Lazy<IDeckService>(() => new DeckService(repositoryManager, userManager, mapper));
         _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, configuration));
     }
 
