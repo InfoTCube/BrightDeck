@@ -1,7 +1,6 @@
 using API.Entities;
 using API.Entities.ConfigurationModels;
 using API.Interfaces;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 

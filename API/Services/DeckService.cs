@@ -5,7 +5,6 @@ using API.Entities.Exceptions;
 using API.Helpers;
 using API.Interfaces;
 using API.Utility.Mappings;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 
 namespace API.Services;

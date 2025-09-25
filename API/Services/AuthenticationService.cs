@@ -8,7 +8,6 @@ using API.Entities.ConfigurationModels;
 using API.Entities.Exceptions;
 using API.Interfaces;
 using API.Utility.Mappings;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
