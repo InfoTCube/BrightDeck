@@ -14,6 +14,8 @@ public class DeckRepository : RepositoryBase<Deck>, IDeckRepository
     public async Task<Deck> GetDeckByIdAsync(Guid id, bool trackChanges)
     {
         var deck = await FindByCondition(d => d.Id == id, trackChanges)
+            .Include(d => d.Author)
+            .Include(d => d.Flashcards)
             .SingleOrDefaultAsync();
 
         return deck;

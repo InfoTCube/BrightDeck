@@ -1,6 +1,6 @@
 namespace API.DTOs;
 
-public record DeckDto
+public class ListedDeckDto
 {
     public Guid Id { get; init; }
     public string Title { get; init; }
@@ -8,5 +8,4 @@ public record DeckDto
     public bool Public { get; init; }
     public DateTime CreatedAt { get; init; }
     public string? AuthorUsername { get; init; }
-    public IEnumerable<FlashcardDto> Flashcards { get; set; }
 }

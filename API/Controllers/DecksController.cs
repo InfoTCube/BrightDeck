@@ -1,9 +1,11 @@
 using System.Text.Json;
 using API.DTOs;
+using API.Entities.Exceptions;
 using API.Helpers;
 using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NLog.Config;
 
 namespace API.Controllers;
 
@@ -25,6 +27,14 @@ public class DecksController : ControllerBase
         return Ok(pagedResult.decks);
     }
 
+    [HttpGet("{id:guid}", Name = "DeckById")]
+    public async Task<IActionResult> GetDeck(Guid id)
+    {
+        var deck = await _service.DeckService.GetDeckById(id, User.Identity.Name, trackChanges: false);
+
+        return Ok(deck);
+    }
+
     [Authorize]
     [HttpGet("currentUser")]
     public async Task<IActionResult> GetDecksForCurrentUser([FromQuery] DeckParameters deckParameters)
@@ -39,16 +49,15 @@ public class DecksController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateDeck([FromBody] DeckForCreationDto deck)
     {
-        var deckResponse = await _service.DeckService.CreateDeckAsync(deck, User.Identity.Name, false);
+        var createdDeck = await _service.DeckService.CreateDeckAsync(deck, User.Identity.Name, trackChanges: false);
 
-        //return CreatedAtRoute("GetDeck", deckResponse);
-        return Created();
+        return CreatedAtRoute("DeckById", new { id = createdDeck.Id }, createdDeck);
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteDeck(Guid id)
     {
-        await _service.DeckService.DeleteDeckAsync(id, false);
+        await _service.DeckService.DeleteDeckAsync(id, trackChanges: false);
         return NoContent();
     }
 }

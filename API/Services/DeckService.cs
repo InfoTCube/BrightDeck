@@ -20,25 +20,40 @@ public sealed class DeckService : IDeckService
         _userManager = userManager;
     }
 
-    public async Task<(IEnumerable<DeckDto> decks, MetaData metaData)> GetPublicDecksAsync(DeckParameters deckParameters, bool trackChanges)
+    public async Task<DeckDto> GetDeckById(Guid id, string username, bool trackChanges)
+    {
+        var deck = await _repository.DeckRepository.GetDeckByIdAsync(id, trackChanges);
+
+        if (deck is null)
+            throw new DeckNotFoundException(id);
+
+        if (!deck.Public && deck.Author?.UserName != username)
+            throw new UnauthorizedException();
+
+        var deckDto = deck.ToDto();
+
+        return deckDto;
+    }
+
+    public async Task<(IEnumerable<ListedDeckDto> decks, MetaData metaData)> GetPublicDecksAsync(DeckParameters deckParameters, bool trackChanges)
     {
         var decksWithMetaData = await _repository.DeckRepository.GetDecksAsync(deckParameters, trackChanges);
 
-        var decksDtos = decksWithMetaData.ToDto();
+        var decksDtos = decksWithMetaData.ToListedDto();
 
         return (decks: decksDtos, metaData: decksWithMetaData.MetaData);
     }
 
-    public async Task<(IEnumerable<DeckDto> decks, MetaData metaData)> GetDecksForCurrentUser(DeckParameters deckParameters, string username, bool trackChanges)
+    public async Task<(IEnumerable<ListedDeckDto> decks, MetaData metaData)> GetDecksForCurrentUser(DeckParameters deckParameters, string username, bool trackChanges)
     {
         var decksWithMetaData = await _repository.DeckRepository.GetDecksForUserAsync(deckParameters, username, trackChanges);
 
-        var decksDtos = decksWithMetaData.ToDto();
+        var decksDtos = decksWithMetaData.ToListedDto();
 
         return (decks: decksDtos, metaData: decksWithMetaData.MetaData);
     }
 
-    public async Task<DeckDto> CreateDeckAsync(DeckForCreationDto deckForCreation, string username, bool trackChanges)
+    public async Task<ListedDeckDto> CreateDeckAsync(DeckForCreationDto deckForCreation, string username, bool trackChanges)
     {
         var user = await _userManager.FindByNameAsync(username);
 
@@ -52,7 +67,7 @@ public sealed class DeckService : IDeckService
         _repository.DeckRepository.CreateDeck(deckEntity);
         await _repository.SaveAsync();
 
-        var deckResponse = deckEntity.ToDto();
+        var deckResponse = deckEntity.ToListedDto();
         return deckResponse;
     }
 
