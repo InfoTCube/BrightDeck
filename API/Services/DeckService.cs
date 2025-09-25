@@ -4,6 +4,7 @@ using API.Entities;
 using API.Entities.Exceptions;
 using API.Helpers;
 using API.Interfaces;
+using API.Utility.Mappings;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 
@@ -13,20 +14,18 @@ public sealed class DeckService : IDeckService
 {
     private readonly IRepositoryManager _repository;
     private readonly UserManager<AppUser> _userManager;
-    private readonly IMapper _mapper;
 
-    public DeckService(IRepositoryManager repository, UserManager<AppUser> userManager, IMapper mapper)
+    public DeckService(IRepositoryManager repository, UserManager<AppUser> userManager)
     {
         _repository = repository;
         _userManager = userManager;
-        _mapper = mapper;
     }
 
     public async Task<(IEnumerable<DeckDto> decks, MetaData metaData)> GetPublicDecksAsync(DeckParameters deckParameters, bool trackChanges)
     {
         var decksWithMetaData = await _repository.DeckRepository.GetDecksAsync(deckParameters, trackChanges);
 
-        var decksDtos = _mapper.Map<IEnumerable<DeckDto>>(decksWithMetaData);
+        var decksDtos = decksWithMetaData.ToDto();
 
         return (decks: decksDtos, metaData: decksWithMetaData.MetaData);
     }
@@ -35,7 +34,7 @@ public sealed class DeckService : IDeckService
     {
         var decksWithMetaData = await _repository.DeckRepository.GetDecksForUserAsync(deckParameters, username, trackChanges);
 
-        var decksDtos = _mapper.Map<IEnumerable<DeckDto>>(decksWithMetaData);
+        var decksDtos = decksWithMetaData.ToDto();
 
         return (decks: decksDtos, metaData: decksWithMetaData.MetaData);
     }
@@ -47,14 +46,14 @@ public sealed class DeckService : IDeckService
         if (user is null)
             throw new UserBadRequestException();
 
-        var deckEntity = _mapper.Map<Deck>(deckForCreation);
+        var deckEntity = deckForCreation.ToEntity();
         deckEntity.CreatedAt = DateTime.UtcNow;
         deckEntity.Author = user;
 
         _repository.DeckRepository.CreateDeck(deckEntity);
         await _repository.SaveAsync();
 
-        var deckResponse = _mapper.Map<DeckDto>(deckEntity);
+        var deckResponse = deckEntity.ToDto();
         return deckResponse;
     }
 

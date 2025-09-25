@@ -12,11 +12,11 @@ public sealed class ServiceManager : IServiceManager
     private readonly Lazy<IDeckService> _deckService;
     private readonly Lazy<IAuthenticationService> _authenticationService;
 
-    public ServiceManager(IRepositoryManager repositoryManager, IMapper mapper, ILoggerManager logger,
+    public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger,
         UserManager<AppUser> userManager, IOptions<JwtConfiguration> configuration)
     {
-        _deckService = new Lazy<IDeckService>(() => new DeckService(repositoryManager, userManager, mapper));
-        _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, configuration));
+        _deckService = new Lazy<IDeckService>(() => new DeckService(repositoryManager, userManager));
+        _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, userManager, configuration));
     }
 
     public IDeckService DeckService => _deckService.Value;

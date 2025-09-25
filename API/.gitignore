@@ -485,3 +485,4 @@ $RECYCLE.BIN/
 
 appsettings.json
 internal_logs/*
+database.db

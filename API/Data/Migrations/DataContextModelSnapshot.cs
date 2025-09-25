@@ -113,7 +113,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("Decks");
+                    b.ToTable("Decks", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.Flashcard", b =>
@@ -137,7 +137,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("DeckId");
 
-                    b.ToTable("Flashcard");
+                    b.ToTable("Flashcard", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

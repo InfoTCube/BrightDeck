@@ -7,6 +7,7 @@ using API.Entities;
 using API.Entities.ConfigurationModels;
 using API.Entities.Exceptions;
 using API.Interfaces;
+using API.Utility.Mappings;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -17,18 +18,16 @@ namespace API.Services;
 public sealed class AuthenticationService : IAuthenticationService
 {
     private readonly ILoggerManager _logger;
-    private readonly IMapper _mapper;
     private readonly UserManager<AppUser> _userManager;
     private readonly IOptions<JwtConfiguration> _configuration;
     private readonly JwtConfiguration _jwtConfiguration;
 
     private AppUser? _user;
 
-    public AuthenticationService(ILoggerManager logger, IMapper mapper,
+    public AuthenticationService(ILoggerManager logger,
         UserManager<AppUser> userManager, IOptions<JwtConfiguration> configuration)
     {
         _logger = logger;
-        _mapper = mapper;
         _userManager = userManager;
         _configuration = configuration;
         _jwtConfiguration = _configuration.Value;
@@ -36,7 +35,7 @@ public sealed class AuthenticationService : IAuthenticationService
 
     public async Task<IdentityResult> RegisterUser(UserForRegistrationDto userForRegistration)
     {
-        var user = _mapper.Map<AppUser>(userForRegistration);
+        var user = userForRegistration.ToEntity();
 
         var result = await _userManager.CreateAsync(user, userForRegistration.Password);
 

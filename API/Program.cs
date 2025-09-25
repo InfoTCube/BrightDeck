@@ -20,7 +20,6 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<DataContext>(opt =>
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
