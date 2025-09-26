@@ -1,6 +1,6 @@
 namespace API.DTOs;
 
-public class ListedDeckDto
+public record ListedDeckDto
 {
     public Guid Id { get; init; }
     public string Title { get; init; }

@@ -27,6 +27,16 @@ public class DecksController : ControllerBase
         return Ok(pagedResult.decks);
     }
 
+    [HttpGet("user/{userId:guid}")]
+    public async Task<IActionResult> GetPublicDecksForUser(Guid userId, [FromQuery] DeckParameters deckParameters)
+    {
+        var pagedResult = await _service.DeckService.GetPublicDecksByUserId(userId, deckParameters, trackChanges: false);
+
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+
+        return Ok(pagedResult.decks);
+    }
+
     [HttpGet("{id:guid}", Name = "DeckById")]
     public async Task<IActionResult> GetDeck(Guid id)
     {
@@ -54,10 +64,23 @@ public class DecksController : ControllerBase
         return CreatedAtRoute("DeckById", new { id = createdDeck.Id }, createdDeck);
     }
 
+    [Authorize]
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateDeck(Guid id, [FromBody] DeckForUpdateDto deck)
+    {
+        if (deck is null)
+            return BadRequest("DeckForUpdateDto object is null.");
+
+        _service.DeckService.UpdateDeck(id, deck, User.Identity.Name, trackChanges: true);
+
+        return NoContent();
+    }
+
+    [Authorize]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteDeck(Guid id)
     {
-        await _service.DeckService.DeleteDeckAsync(id, trackChanges: false);
+        await _service.DeckService.DeleteDeckAsync(id, User.Identity.Name, trackChanges: false);
         return NoContent();
     }
 }

@@ -31,6 +31,16 @@ public class DeckRepository : RepositoryBase<Deck>, IDeckRepository
             .ToPagedList(decks, deckParameters.PageNumber, deckParameters.PageSize);
     }
 
+    public async Task<PagedList<Deck>> GetDecksByUserIdAsync(DeckParameters deckParameters, Guid userId, bool trackChanges)
+    {
+        var decks = await FindByCondition(d => d.Public && d.Author.Id == userId.ToString(), trackChanges)
+            .Include(d => d.Author)
+            .ToListAsync();
+
+        return PagedList<Deck>
+            .ToPagedList(decks, deckParameters.PageNumber, deckParameters.PageSize);
+    }
+
     public async Task<PagedList<Deck>> GetDecksForUserAsync(DeckParameters deckParameters, string username, bool trackChanges)
     {
         var decks = await FindByCondition(d => d.Author.UserName == username, trackChanges)

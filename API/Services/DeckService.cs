@@ -44,6 +44,15 @@ public sealed class DeckService : IDeckService
         return (decks: decksDtos, metaData: decksWithMetaData.MetaData);
     }
 
+    public async Task<(IEnumerable<ListedDeckDto> decks, MetaData metaData)> GetPublicDecksByUserId(Guid userId, DeckParameters deckParameters, bool trackChanges)
+    {
+        var decksWithMetaData = await _repository.DeckRepository.GetDecksByUserIdAsync(deckParameters, userId, trackChanges);
+
+        var decksDtos = decksWithMetaData.ToListedDto();
+
+        return (decks: decksDtos, metaData: decksWithMetaData.MetaData);
+    }
+
     public async Task<(IEnumerable<ListedDeckDto> decks, MetaData metaData)> GetDecksForCurrentUser(DeckParameters deckParameters, string username, bool trackChanges)
     {
         var decksWithMetaData = await _repository.DeckRepository.GetDecksForUserAsync(deckParameters, username, trackChanges);
@@ -71,12 +80,31 @@ public sealed class DeckService : IDeckService
         return deckResponse;
     }
 
-    public async Task DeleteDeckAsync(Guid id, bool trackChanges)
+    public async Task UpdateDeck(Guid id, DeckForUpdateDto deckForUpdate, string username, bool trackChanges)
+    {
+        var deck = await _repository.DeckRepository.GetDeckByIdAsync(id, trackChanges);
+        if (deck is null)
+            throw new DeckNotFoundException(id);
+
+        if (deck.Author?.UserName != username)
+            throw new UnauthorizedException();
+
+        deck.Title = deckForUpdate.Title;
+        deck.Description = deckForUpdate.Description;
+        deck.Public = deckForUpdate.Public;
+
+        await _repository.SaveAsync();
+    }
+
+    public async Task DeleteDeckAsync(Guid id, string username, bool trackChanges)
     {
         var deck = await _repository.DeckRepository.GetDeckByIdAsync(id, trackChanges);
 
         if (deck is null)
             throw new DeckNotFoundException(id);
+
+        if (deck.Author?.UserName != username)
+            throw new UnauthorizedException();
 
         _repository.DeckRepository.DeleteDeck(deck);
         await _repository.SaveAsync();
